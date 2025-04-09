@@ -1,0 +1,54 @@
+[
+  {
+    "title": "Ability to Code",
+    "materials": [
+      {
+        "title": "What is Programming?",
+        "url": "https://learnenglish.britishcouncil.org/skills/reading"
+      },
+      {
+        "title": "Getting Started with Python",
+        "url": "https://learnenglish.britishcouncil.org/skills/reading"
+      }
+    ]
+  },
+  {
+    "title": "Language Reasoning",
+    "materials": [
+      {
+        "title": "Reading Comprehension Basics",
+        "url": "https://learnenglish.britishcouncil.org/skills/reading"
+      },
+      {
+        "title": "Logical Flow of Sentences",
+        "url": "https://learnenglish.britishcouncil.org/skills/reading"
+      }
+    ]
+  },
+  {
+    "title": "Analytical Reasoning",
+    "materials": [
+      {
+        "title": "Pattern Recognition Techniques",
+        "url": "https://learnenglish.britishcouncil.org/skills/reading"
+      },
+      {
+        "title": "Syllogism Explained",
+        "url": "https://learnenglish.britishcouncil.org/skills/reading"
+      }
+    ]
+  },
+  {
+    "title": "Aptitude",
+    "materials": [
+      {
+        "title": "Basic Quantitative Techniques",
+        "url": "https://learnenglish.britishcouncil.org/skills/reading"
+      },
+      {
+        "title": "Time & Work Explained",
+        "url": "https://learnenglish.britishcouncil.org/skills/reading"
+      }
+    ]
+  }
+]
