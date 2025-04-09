@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {cn} from "../lib/utils.js";
 
 const McqQuestionForm = ({paper, onBack}) => {
