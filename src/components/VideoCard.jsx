@@ -1,33 +1,46 @@
+import React from "react";
+
 const VideoCard = ({video}) => {
     return (
-        <div className="flex-shrink-0 w-[300px]">
-            <a
-                href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative block w-full rounded-xl overflow-hidden bg-neutral-950 hover:bg-neutral-900 transition-all duration-300 shadow-md hover:shadow-xl border border-neutral-800"
-            >
-                <div className="relative w-full">
+        <a
+            href={`https://www.youtube.com/watch?v=${video.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group"
+        >
+            <div
+                className="relative overflow-hidden rounded-2xl bg-zinc-800 shadow hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
+
+                {/* Thumbnail with Overlay */}
+                <div className="relative aspect-video">
                     <img
-                        src={
-                            video.thumbnail ||
-                            `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`
-                        }
+                        src={`https://img.youtube.com/vi/${video.id}/mqdefault.jpg`}
                         alt={video.title}
-                        className="w-full aspect-video object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                        className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
                     />
-
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                    <div
+                        className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/70 transition duration-300">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div
+                                className="w-12 h-12 bg-white/80 rounded-full flex items-center justify-center shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                     className="text-red-600">
+                                    <polygon points="5 3 19 12 5 21 5 3"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="px-4 py-3">
-                    <p className="text-white text-base font-medium line-clamp-2 leading-snug group-hover:text-sky-400 transition-colors">
+                {/* Info */}
+                <div className="p-4 flex flex-col flex-grow">
+                    <h3 className="font-medium text-sm text-white line-clamp-2 group-hover:text-blue-400 transition-colors">
                         {video.title}
-                    </p>
+                    </h3>
+                    <p className="text-xs text-zinc-400 mt-2">{video.author}</p>
                 </div>
-            </a>
-        </div>
-
+            </div>
+        </a>
     )
 }
 

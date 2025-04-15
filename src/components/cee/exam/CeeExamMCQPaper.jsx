@@ -1,10 +1,24 @@
-import {useState} from "react";
-import {cn} from "../lib/utils.js";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { cn } from "../../../lib/utils.js";
+import {categories} from "./CeeExamMCQs.jsx";
 
-const McqQuestionForm = ({paper, onBack}) => {
+export default function CeeExamMCQPaper() {
+    const navigate = useNavigate();
+    const { paperId } = useParams();
+
+    // Find the paper from data
+    const paper = Object.values(categories)
+        .flatMap((cat) => cat.papers)
+        .find((p) => p.id === paperId);
+
     const [answers, setAnswers] = useState({});
     const [results, setResults] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
+
+    if (!paper) {
+        return <div className="text-red-500">Paper not found.</div>;
+    }
 
     const handleOptionChange = (questionId, option) => {
         setAnswers((prev) => ({
@@ -14,7 +28,7 @@ const McqQuestionForm = ({paper, onBack}) => {
 
         if (validationErrors[questionId]) {
             setValidationErrors((prev) => {
-                const newErrors = {...prev};
+                const newErrors = { ...prev };
                 delete newErrors[questionId];
                 return newErrors;
             });
@@ -23,8 +37,8 @@ const McqQuestionForm = ({paper, onBack}) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const newErrors = {};
 
+        const newErrors = {};
         paper.questions.forEach((q) => {
             if (!answers[q.id]) {
                 newErrors[q.id] = "Please select an option.";
@@ -57,12 +71,22 @@ const McqQuestionForm = ({paper, onBack}) => {
         });
     };
 
+    const handleBack = () => {
+        navigate("/cee/exam/mcqs");
+    };
+
+    const handleRetake = () => {
+        setAnswers({});
+        setResults(null);
+        setValidationErrors({});
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-white">{paper.title}</h2>
                 <button
-                    onClick={onBack}
+                    onClick={handleBack}
                     className="text-sm text-neutral-400 hover:text-white border border-neutral-700 px-4 py-1 rounded"
                 >
                     ← Back
@@ -83,7 +107,8 @@ const McqQuestionForm = ({paper, onBack}) => {
                                     return (
                                         <label
                                             key={optIdx}
-                                            className={cn("flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer",
+                                            className={cn(
+                                                "flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer",
                                                 isSelected
                                                     ? "border-sky-500 bg-sky-900/20"
                                                     : "border-neutral-700 hover:border-neutral-500 hover:bg-neutral-800/30"
@@ -125,11 +150,12 @@ const McqQuestionForm = ({paper, onBack}) => {
                     {results.feedback.map((item, idx) => (
                         <div
                             key={idx}
-                            className={`rounded-xl p-4 border ${
+                            className={cn(
+                                "rounded-xl p-4 border",
                                 item.isCorrect
                                     ? "border-green-600 bg-green-900/20"
                                     : "border-red-600 bg-red-900/20"
-                            }`}
+                            )}
                         >
                             <p className="text-white font-medium mb-2">
                                 {idx + 1}. {item.question}
@@ -142,25 +168,21 @@ const McqQuestionForm = ({paper, onBack}) => {
                                     return (
                                         <div
                                             key={i}
-                                            className={`flex items-center gap-2 px-3 py-1 rounded-lg border
-                        ${
+                                            className={cn(
+                                                "flex items-center gap-2 px-3 py-1 rounded-lg border",
                                                 isCorrect
                                                     ? "border-green-500 bg-green-700/20"
                                                     : isSelected
                                                         ? "border-red-500 bg-red-700/20"
                                                         : "border-neutral-700"
-                                            }`}
+                                            )}
                                         >
                                             <span className="text-white">{opt}</span>
                                             {isCorrect && (
-                                                <span className="text-green-400 ml-auto text-xs">
-                          ✅ Correct
-                        </span>
+                                                <span className="text-green-400 ml-auto text-xs">✅ Correct</span>
                                             )}
                                             {!isCorrect && isSelected && (
-                                                <span className="text-red-400 ml-auto text-xs">
-                          ❌ Your Answer
-                        </span>
+                                                <span className="text-red-400 ml-auto text-xs">❌ Your Answer</span>
                                             )}
                                         </div>
                                     );
@@ -170,15 +192,13 @@ const McqQuestionForm = ({paper, onBack}) => {
                     ))}
 
                     <button
-                        onClick={onBack}
+                        onClick={handleRetake}
                         className="mt-6 px-6 py-2 bg-neutral-800 text-white rounded-lg hover:bg-neutral-700"
                     >
-                        Try Another Paper
+                        Try Again
                     </button>
                 </div>
             )}
         </div>
     );
-};
-
-export default McqQuestionForm;
+}

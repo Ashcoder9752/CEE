@@ -1,6 +1,12 @@
-export const abilityToCode = [
+import { useState } from "react";
+import {Outlet, useMatch, useNavigate} from "react-router-dom";
+import QuestionPaperCard from "../../../components/QuestionPaperCard.jsx";
+import { cn } from "../../../lib/utils.js";
+
+const abilityToCode = [
     {
         title: "Paper 1",
+        id: "coding-paper-1",
         questions: [
             {
                 id: 1,
@@ -29,6 +35,7 @@ export const abilityToCode = [
     },
     {
         title: "Paper 2",
+        id: "coding-paper-2",
         questions: [
             {
                 id: 1,
@@ -57,9 +64,10 @@ export const abilityToCode = [
     }
 ];
 
-export const languageReasoning = [
+const languageReasoning = [
     {
         title: "Paper 1",
+        id: "language-paper-1",
         questions: [
             {
                 id: 1,
@@ -83,6 +91,7 @@ export const languageReasoning = [
     },
     {
         title: "Paper 2",
+        id: "language-paper-2",
         questions: [
             {
                 id: 1,
@@ -106,9 +115,10 @@ export const languageReasoning = [
     }
 ];
 
-export const analyticalReasoning = [
+const analyticalReasoning = [
     {
         title: "Paper 1",
+        id: "reasoning-paper-1",
         questions: [
             {
                 id: 1,
@@ -132,6 +142,7 @@ export const analyticalReasoning = [
     },
     {
         title: "Paper 2",
+        id: "reasoning-paper-2",
         questions: [
             {
                 id: 1,
@@ -155,9 +166,10 @@ export const analyticalReasoning = [
     }
 ];
 
-export const aptitude = [
+const aptitude = [
     {
         title: "Paper 1",
+        id: "aptitude-paper-1",
         questions: [
             {
                 id: 1,
@@ -181,6 +193,7 @@ export const aptitude = [
     },
     {
         title: "Paper 2",
+        id: "aptitude-paper-2",
         questions: [
             {
                 id: 1,
@@ -203,3 +216,67 @@ export const aptitude = [
         ]
     }
 ];
+
+// CATEGORY MAP
+export const categories = {
+    coding: { id: "coding", title: "Ability to Code", papers: abilityToCode },
+    language: { id: "language", title: "Language Reasoning", papers: languageReasoning },
+    reasoning: { id: "reasoning", title: "Analytical Reasoning", papers: analyticalReasoning },
+    aptitude: { id: "aptitude", title: "Aptitude", papers: aptitude },
+};
+
+export default function CeeExamMCQs() {
+    const [activeCategory, setActiveCategory] = useState("coding");
+    const navigate = useNavigate();
+
+    const isPaperRoute = useMatch("/cee/exam/mcqs/:paperId");
+
+    const handlePaperClick = (paper) => {
+        navigate(`/cee/exam/mcqs/${paper.id}`);
+    };
+
+    // ✅ If on a paper route, just show the Outlet (nested page)
+    if (isPaperRoute) {
+        return (
+            <div className="max-w-7xl mx-auto px-6 py-10 max-h-[60vh] overflow-y-auto">
+                <Outlet />
+            </div>
+        );
+    }
+
+    // ✅ Default view with tabs and cards
+    return (
+        <div className="max-w-7xl mx-auto px-6 py-10 max-h-[60vh] overflow-y-auto">
+            {/* Category Tabs */}
+            <div className="flex justify-center mb-10">
+                <div className="bg-zinc-800 rounded-full p-1 inline-flex shadow-inner">
+                    {Object.values(categories).map((category) => (
+                        <button
+                            key={category.id}
+                            onClick={() => setActiveCategory(category.id)}
+                            className={cn(
+                                "px-6 py-2 text-sm font-medium rounded-full transition-all duration-300",
+                                activeCategory === category.id
+                                    ? "bg-blue-600 text-white shadow-md"
+                                    : "text-zinc-400 hover:text-white hover:bg-zinc-700"
+                            )}
+                        >
+                            {category.title}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Question Papers Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {categories[activeCategory].papers.map((paper, idx) => (
+                    <QuestionPaperCard
+                        key={idx}
+                        paper={paper}
+                        onClick={() => handlePaperClick(paper)}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+}

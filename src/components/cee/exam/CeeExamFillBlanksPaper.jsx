@@ -1,14 +1,29 @@
 import { useState } from "react";
-import {cn} from "../lib/utils.js";
+import { useNavigate, useParams } from "react-router-dom";
+import { cn } from "../../../lib/utils.js";
+import {fillBlankCategories} from "./CeeExamFillBlanks.jsx";
 
-const FillInTheBlanksPaperForm = ({ paper, onBack }) => {
+export default function CeeExamFillBlanksPaper() {
+    const navigate = useNavigate();
+    const { paperId } = useParams();
+
+    // Find the paper from data
+    const paper = Object.values(fillBlankCategories)
+        .flatMap((cat) => cat.papers)
+        .find((p) => p.id === paperId);
+
+    const [answers, setAnswers] = useState({});
     const [results, setResults] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
+
+    if (!paper) {
+        return <div className="text-red-500">Paper not found.</div>;
+    }
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
 
-        // Clear error on typing
+        // Clear error when user starts typing
         if (validationErrors[name] && value.trim() !== "") {
             setValidationErrors((prev) => {
                 const newErrors = { ...prev };
@@ -16,34 +31,37 @@ const FillInTheBlanksPaperForm = ({ paper, onBack }) => {
                 return newErrors;
             });
         }
+
+        setAnswers((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const formData = new FormData(e.target);
-        const userAnswers = {};
         const newErrors = {};
 
+        // Validation
         paper.questions.forEach((q) => {
             const key = `q${q.id}`;
-            const value = (formData.get(key) || "").trim();
+            const value = answers[key]?.trim();
             if (!value) {
                 newErrors[key] = "This field is required.";
             }
-            userAnswers[key] = value.toLowerCase();
         });
 
-        // If validation fails
         if (Object.keys(newErrors).length > 0) {
             setValidationErrors(newErrors);
             return;
         }
 
-        setValidationErrors({}); // Clear errors if all good
+        setValidationErrors({});
 
+        // Check answers
         let correctCount = 0;
         const feedback = paper.questions.map((q) => {
-            const userAnswer = userAnswers[`q${q.id}`] || "";
+            const userAnswer = answers[`q${q.id}`]?.trim().toLowerCase() || "";
             const isCorrect = userAnswer === q.answer.trim().toLowerCase();
             if (isCorrect) correctCount++;
             return {
@@ -64,9 +82,9 @@ const FillInTheBlanksPaperForm = ({ paper, onBack }) => {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold">{paper.title}</h2>
+                <h2 className="text-2xl font-bold text-white">{paper.title}</h2>
                 <button
-                    onClick={onBack}
+                    onClick={() => navigate(-1)} // Go back to the previous page
                     className="text-sm text-neutral-400 hover:text-white border border-neutral-700 px-4 py-1 rounded"
                 >
                     ← Back
@@ -81,14 +99,16 @@ const FillInTheBlanksPaperForm = ({ paper, onBack }) => {
 
                         return (
                             <div key={q.id}>
-                                <label className="block mb-2 font-medium">
-                                    {index + 1}. {q.question.replace("___", "_____")}
+                                <label className="block mb-2 font-medium text-white">
+                                    {index + 1}. {q.question.replace("____", "_____")}
                                 </label>
                                 <input
                                     type="text"
                                     name={key}
+                                    value={answers[key] || ""}
                                     onChange={handleInputChange}
-                                    className={cn("w-full px-4 py-2 rounded bg-neutral-800 text-white border",
+                                    className={cn(
+                                        "w-full px-4 py-2 rounded bg-neutral-800 text-white border",
                                         hasError
                                             ? "border-red-600 focus:outline-red-500"
                                             : "border-neutral-700"
@@ -105,7 +125,7 @@ const FillInTheBlanksPaperForm = ({ paper, onBack }) => {
 
                     <button
                         type="submit"
-                        className="px-6 py-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-xl"
+                        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl"
                     >
                         Submit Answers
                     </button>
@@ -119,14 +139,15 @@ const FillInTheBlanksPaperForm = ({ paper, onBack }) => {
                     {results.feedback.map((item, index) => (
                         <div
                             key={index}
-                            className={`border rounded-xl p-4 ${
+                            className={cn(
+                                "border rounded-xl p-4",
                                 item.isCorrect
                                     ? "border-green-600 bg-green-900/20"
                                     : "border-red-600 bg-red-900/20"
-                            }`}
+                            )}
                         >
                             <p className="mb-1 font-medium text-white">
-                                {index + 1}. {item.question.replace("___", "_____")}
+                                {index + 1}. {item.question.replace("____", "_____")}
                             </p>
                             <p className="text-sm text-neutral-300">
                                 Your answer:{" "}
@@ -148,7 +169,7 @@ const FillInTheBlanksPaperForm = ({ paper, onBack }) => {
                     ))}
 
                     <button
-                        onClick={onBack}
+                        onClick={() => navigate(-1)} // Go back to the previous page
                         className="mt-6 px-6 py-2 bg-neutral-800 text-white rounded-lg hover:bg-neutral-700"
                     >
                         Try Another Paper
@@ -158,5 +179,3 @@ const FillInTheBlanksPaperForm = ({ paper, onBack }) => {
         </div>
     );
 };
-
-export default FillInTheBlanksPaperForm;
